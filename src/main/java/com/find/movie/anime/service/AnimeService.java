@@ -1,10 +1,11 @@
 package com.find.movie.anime.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.find.movie.anime.model.Anime;
 import com.find.movie.anime.repository.AnimeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 public class AnimeService {
 
     private final AnimeRepository animeRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnimeService.class);
 
     @Autowired
     public AnimeService(AnimeRepository animeRepository) {
@@ -39,7 +41,7 @@ public class AnimeService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("context", e);
         }
         return null;
     }
