@@ -27,9 +27,8 @@ Basic REST service:
 - Build the project using Maven or Gradle.
 - Set up the database connection in the application.properties file (Use PostgreSQL).
 - Run the application.
-
-API SRC: 
-`https://docs.api.jikan.moe/`
+ 
+[API SRC](https://docs.api.jikan.moe/)
 
 <img src="https://iis.bsuir.by/api/v1/employees/photo/532500">
 
