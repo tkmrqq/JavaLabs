@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AnimeController {
-
     private final AnimeService animeService;
 
     @Autowired
@@ -17,8 +16,8 @@ public class AnimeController {
         this.animeService = animeService;
     }
 
-   @GetMapping("/anime")
-    public Anime saveDesc(@RequestParam("title") String title){
+    @GetMapping("/anime")
+    public Anime saveDesc(@RequestParam("title") String title) {
         return animeService.getAnimeData(title);
     }
 
@@ -26,10 +25,6 @@ public class AnimeController {
     public Anime saveAnimeDescription(@RequestBody AnimeRequest request) {
         return animeService.getAnimeData(request.getAnimeName());
     }
-
-
-
-
 }
 
 
