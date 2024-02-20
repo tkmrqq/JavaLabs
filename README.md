@@ -1,7 +1,13 @@
 # Search anime
-## Basic REST API service</h2>
+## Basic REST API service
 
 1) Simple web/REST service Spring to search anime description by his title. Get and Post endpoints"
+2) You can send GET request: `http://localhost:8080/anime?title=naruto`
+   and POST request:
+   `{
+    "animeName": "cowboy bebop"
+   }`
+   
 
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=tkmrqq_JavaLabs)](https://sonarcloud.io/summary/new_code?id=tkmrqq_JavaLabs)
 
@@ -20,6 +26,12 @@ Basic REST service:
 - Create and locally run a simple web/REST service using any open example with the Java stack: Spring (Spring Boot)/maven/gradle/Jersey/ Spring MVC.
 - Add a GET endpoint that accepts input parameters as queryParams in the URL according to the variant, and returns any hard-coded result in JSON format according to the variant.
 
+## Dependendencies
+- Spring Boot
+- Spring Web
+- RestTemplate
+- JSON.org
+- PostgreSQL
 
 ## Installation:
 - Clone the repository: `git clone https://github.com/tkmrqq/JavaLabs.git`
