@@ -28,6 +28,9 @@ public class Anime {
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
 
+    @OneToMany
+    private List<Titles> titlesList;
+
     public Anime() {
     }
 
@@ -111,7 +114,15 @@ public class Anime {
         this.genres = genres;
     }
 
-    public Anime(String name, String description, String source, String type, int episodes, double score, String picUrl, String duration, List<Genre> genres) {
+    public List<Titles> getTitlesList() {
+        return titlesList;
+    }
+
+    public void setTitlesList(List<Titles> titlesList) {
+        this.titlesList = titlesList;
+    }
+
+    public Anime(String name, String description, String source, String type, int episodes, double score, String picUrl, String duration, List<Genre> genres, List<Titles> titlesList) {
         this.name = name;
         this.description = description;
         this.source = source;
@@ -121,5 +132,6 @@ public class Anime {
         this.picUrl = picUrl;
         this.duration = duration;
         this.genres = genres;
+        this.titlesList = titlesList;
     }
 }
