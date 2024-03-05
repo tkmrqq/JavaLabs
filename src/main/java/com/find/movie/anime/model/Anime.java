@@ -122,16 +122,10 @@ public class Anime {
         this.titlesList = titlesList;
     }
 
-    public Anime(String name, String description, String source, String type, int episodes, double score, String picUrl, String duration, List<Genre> genres, List<Titles> titlesList) {
+    public Anime(String name, String description, int episodes, double score) {
         this.name = name;
         this.description = description;
-        this.source = source;
-        this.type = type;
         this.episodes = episodes;
         this.score = score;
-        this.picUrl = picUrl;
-        this.duration = duration;
-        this.genres = genres;
-        this.titlesList = titlesList;
     }
 }

@@ -51,7 +51,7 @@ public class AnimeService {
                     if(anime != null){
                         return anime;
                     }
-                    return processAnimeNode(node);
+                    return processAnimeNode(node, title);
                 }
             }
         } catch (Exception e) {
@@ -60,8 +60,7 @@ public class AnimeService {
         return null;
     }
 
-    private Anime processAnimeNode(JsonNode node) {
-        String title = node.path("title").asText();
+    private Anime processAnimeNode(JsonNode node, String title) {
         String synopsis = node.path("synopsis").asText();
         String source = node.path("source").asText();
         String type = node.path("type").asText();
@@ -100,8 +99,13 @@ public class AnimeService {
             titlesRepository.save(titles);
             titlesList.add(titles);
         }
-
-        Anime anime = new Anime(title, synopsis, source, type, episodes, score, picUrl, duration, genres, titlesList);
+        Anime anime = new Anime(title, synopsis, episodes, score);
+        anime.setSource(source);
+        anime.setType(type);
+        anime.setPicUrl(picUrl);
+        anime.setDuration(duration);
+        anime.setGenres(genres);
+        anime.setTitlesList(titlesList);
         return animeRepository.save(anime);
     }
 
