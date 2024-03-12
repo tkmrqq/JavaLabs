@@ -36,6 +36,10 @@ public class AnimeService {
 
     public Anime getAnimeData(String animeName) {
         RestTemplate restTemplate = new RestTemplate();
+        Anime anime = animeRepository.findByNameIgnoreCase(animeName);
+        if (anime != null){
+            return anime;
+        }
         String url = "https://api.jikan.moe/v4/anime";
         String response = restTemplate.getForObject(url, String.class);
 
@@ -47,10 +51,6 @@ public class AnimeService {
             for (JsonNode node : data) {
                 String title = node.path("title").asText();
                 if (title.equalsIgnoreCase(animeName)) {
-                    Anime anime = animeRepository.findByName(title);
-                    if(anime != null){
-                        return anime;
-                    }
                     return processAnimeNode(node, title);
                 }
             }
@@ -110,24 +110,36 @@ public class AnimeService {
     }
 
     public Anime createAnime(Anime anime){
-        Anime animeTemp = animeRepository.findByName(anime.getName());
+        Anime animeTemp = animeRepository.findByNameIgnoreCase(anime.getName());
         if(animeTemp != null){
             return animeTemp;
         }
         else {
+            for (Genre genre : anime.getGenres()) {
+                if (genre.getId() == null) {
+                    genreRepository.save(genre);
+                }
+            }
+            for (Titles title : anime.getTitlesList()) {
+                if (title.getId() == null) {
+                    titlesRepository.save(title);
+                }
+            }
+
             return animeRepository.save(anime);
         }
     }
 
+
     public void deleteAnime(String title){
-        Anime animeTemp = animeRepository.findByName(title);
+        Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if(animeTemp != null){
             animeRepository.delete(animeTemp);
         }
     }
 
     public Anime patchAnime(String title, int episodes){
-        Anime animeTemp = animeRepository.findByName(title);
+        Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if(animeTemp != null){
             animeTemp.setEpisodes(episodes);
             return animeRepository.save(animeTemp);
@@ -136,7 +148,7 @@ public class AnimeService {
     }
 
     public Anime putAnime(String title, Anime anime){
-        Anime animeTemp = animeRepository.findByName(title);
+        Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if(animeTemp != null){
             anime.setId(animeTemp.getId());
             return animeRepository.save(anime);
