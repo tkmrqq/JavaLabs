@@ -3,6 +3,7 @@ package com.find.movie.anime.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.find.movie.anime.config.CacheConfig;
 import com.find.movie.anime.model.Anime;
 import com.find.movie.anime.model.Genre;
 import com.find.movie.anime.model.Titles;
@@ -24,20 +25,37 @@ public class AnimeService {
     private final AnimeRepository animeRepository;
     private final GenreRepository genreRepository;
     private final TitlesRepository titlesRepository;
-
+    private final CacheConfig cacheMap;
     private static final Logger LOGGER = LoggerFactory.getLogger(AnimeService.class);
 
     @Autowired
-    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository, TitlesRepository titlesRepository) {
+    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository,
+                        TitlesRepository titlesRepository,
+                        CacheConfig cacheMap) {
         this.animeRepository = animeRepository;
         this.genreRepository = genreRepository;
         this.titlesRepository = titlesRepository;
+        this.cacheMap = cacheMap;
+    }
+
+    public List<Anime> getAllAnime() {
+        if (!cacheMap.getAllAnime().isEmpty()) {
+            return cacheMap.getAllAnime();
+        } else {
+            List<Anime> animeList = animeRepository.findAll();
+            cacheMap.putAllAnime(animeList);
+            return animeList;
+        }
     }
 
     public Anime getAnimeData(String animeName) {
         RestTemplate restTemplate = new RestTemplate();
-        Anime anime = animeRepository.findByNameIgnoreCase(animeName);
-        if (anime != null){
+        Anime anime = animeRepository.findByNameIgnoreCase(animeName); //ищем в бд
+
+        if (anime != null) {
+            if (!cacheMap.getAllAnime().contains(anime)){
+                cacheMap.put(anime.getId(), anime);
+            }
             return anime;
         }
         String url = "https://api.jikan.moe/v4/anime";
@@ -91,7 +109,7 @@ public class AnimeService {
         }
 
         ArrayNode titlesArray = (ArrayNode) node.path("titles");
-        for (JsonNode titlesNode : titlesArray){
+        for (JsonNode titlesNode : titlesArray) {
             String titleName = titlesNode.path("title").asText();
             String typeName = titlesNode.path("type").asText();
 
@@ -109,12 +127,11 @@ public class AnimeService {
         return animeRepository.save(anime);
     }
 
-    public Anime createAnime(Anime anime){
+    public Anime createAnime(Anime anime) {
         Anime animeTemp = animeRepository.findByNameIgnoreCase(anime.getName());
-        if(animeTemp != null){
+        if (animeTemp != null) {
             return animeTemp;
-        }
-        else {
+        } else {
             for (Genre genre : anime.getGenres()) {
                 if (genre.getId() == null) {
                     genreRepository.save(genre);
@@ -125,35 +142,38 @@ public class AnimeService {
                     titlesRepository.save(title);
                 }
             }
-
             return animeRepository.save(anime);
         }
     }
 
 
-    public void deleteAnime(String title){
+    public void deleteAnime(String title) {
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
-        if(animeTemp != null){
+        if (animeTemp != null) {
+            cacheMap.remove(animeTemp.getId());
             animeRepository.delete(animeTemp);
         }
     }
 
-    public Anime patchAnime(String title, int episodes){
+    public Anime patchAnime(String title, int episodes) {
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
-        if(animeTemp != null){
+        if (animeTemp != null) {
             animeTemp.setEpisodes(episodes);
             return animeRepository.save(animeTemp);
         }
         return null;
     }
 
-    public Anime putAnime(String title, Anime anime){
+    public Anime putAnime(String title, Anime anime) {
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
-        if(animeTemp != null){
+        if (animeTemp != null) {
             anime.setId(animeTemp.getId());
             return animeRepository.save(anime);
         }
         return null;
     }
 
+    public List<Anime> getAnimesByGenre(String genreName) {
+        return animeRepository.findAnimesByGenre(genreName);
+    }
 }

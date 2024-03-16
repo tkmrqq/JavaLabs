@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class AnimeController {
@@ -20,19 +22,23 @@ public class AnimeController {
     @GetMapping("/anime")
     public ResponseEntity<Anime> saveDesc(@RequestParam("title") String title) {
         Anime anime = animeService.getAnimeData(title);
-        if(anime != null){
+        if (anime != null) {
             return ResponseEntity.ok(anime);
-        }
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Anime>> getAll(){
+        List<Anime> animeList = animeService.getAllAnime();
+        return ResponseEntity.ok(animeList);
     }
 
     @PostMapping("/post")
     public ResponseEntity<Anime> createAnime(@RequestBody Anime request) {
         Anime anime = animeService.createAnime(request);
-        if(anime != null){
+        if (anime != null) {
             return ResponseEntity.ok(anime);
-        }
-        else return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } else return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @DeleteMapping("/delete")
@@ -43,20 +49,23 @@ public class AnimeController {
 
     @PatchMapping("/patch")
     public ResponseEntity<Anime> patchAnime(@RequestParam(value = "title") String title,
-                           @RequestParam(value = "episodes") int episodes){
+                                            @RequestParam(value = "episodes") int episodes) {
         Anime anime = animeService.patchAnime(title, episodes);
-        if(anime != null){
+        if (anime != null) {
             return ResponseEntity.ok(anime);
-        }
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PutMapping("/put")
-    public ResponseEntity<Anime> putAnime(@RequestParam("title") String title, @RequestBody Anime request){
+    public ResponseEntity<Anime> putAnime(@RequestParam("title") String title, @RequestBody Anime request) {
         Anime anime = animeService.putAnime(title, request);
         return anime != null ? ResponseEntity.ok(anime) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @GetMapping("/useful/{name}")
+    public List<Anime> getAnimesByGenre(@PathVariable String name) {
+        return animeService.getAnimesByGenre(name);
+    }
 }
 
 

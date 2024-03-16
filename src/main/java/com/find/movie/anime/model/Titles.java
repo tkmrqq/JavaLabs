@@ -16,10 +16,11 @@ public class Titles {
     private String type;
     private String title;
 
-    public Titles(String title, String type){
+    public Titles(String title, String type) {
         this.title = title;
         this.type = type;
     }
+
     public Titles() {
 
     }
