@@ -1,7 +1,10 @@
 package com.find.movie.anime.controller;
 
+import com.find.movie.anime.exception.AnimeNotFoundException;
+import com.find.movie.anime.exception.BadRequestException;
 import com.find.movie.anime.model.Anime;
 import com.find.movie.anime.service.AnimeService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
+@ControllerAdvice
 @RestController
 public class AnimeController {
     private final AnimeService animeService;
@@ -24,7 +28,7 @@ public class AnimeController {
         Anime anime = animeService.getAnimeData(title);
         if (anime != null) {
             return ResponseEntity.ok(anime);
-        } else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else throw new AnimeNotFoundException("Anime not found with title: " + title);
     }
 
     @GetMapping("/all")
@@ -35,16 +39,21 @@ public class AnimeController {
 
     @PostMapping("/post")
     public ResponseEntity<Anime> createAnime(@RequestBody Anime request) {
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new BadRequestException("Title cannot be empty");
+        }
         Anime anime = animeService.createAnime(request);
-        if (anime != null) {
-            return ResponseEntity.ok(anime);
-        } else return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.ok(anime);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteAnime(@RequestParam("title") String title) {
-        animeService.deleteAnime(title);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteAnime(@RequestParam("title") String title) {
+        try {
+            animeService.deleteAnime(title);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting anime: " + e.getMessage());
+        }
     }
 
     @PatchMapping("/patch")
@@ -53,7 +62,9 @@ public class AnimeController {
         Anime anime = animeService.patchAnime(title, episodes);
         if (anime != null) {
             return ResponseEntity.ok(anime);
-        } else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else {
+            throw new AnimeNotFoundException("Anime not found with title: " + title);
+        }
     }
 
     @PutMapping("/put")
@@ -63,9 +74,15 @@ public class AnimeController {
     }
 
     @GetMapping("/useful/{name}")
-    public List<Anime> getAnimesByGenre(@PathVariable String name) {
-        return animeService.getAnimesByGenre(name);
+    public ResponseEntity<List<Anime>> getAnimeByGenre(@PathVariable String name) {
+        List<Anime> animeGenreList = animeService.getAnimeByGenre(name);
+        if (animeGenreList != null && !animeGenreList.isEmpty()) {
+            return ResponseEntity.ok(animeGenreList);
+        } else {
+            throw new AnimeNotFoundException("not found with genre: " + name);
+        }
     }
+
 }
 
 
