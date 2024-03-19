@@ -25,39 +25,46 @@ public class AnimeService {
     private final AnimeRepository animeRepository;
     private final GenreRepository genreRepository;
     private final TitlesRepository titlesRepository;
-    private final CacheConfig cacheMap;
+    private final CacheConfig animeCache;
     private static final Logger LOGGER = LoggerFactory.getLogger(AnimeService.class);
 
     @Autowired
     public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository,
                         TitlesRepository titlesRepository,
-                        CacheConfig cacheMap) {
+                        CacheConfig animeCache) {
         this.animeRepository = animeRepository;
         this.genreRepository = genreRepository;
         this.titlesRepository = titlesRepository;
-        this.cacheMap = cacheMap;
+        this.animeCache = animeCache;
     }
 
     public List<Anime> getAllAnime() {
-        if (!cacheMap.getAllAnime().isEmpty()) {
-            return cacheMap.getAllAnime();
-        } else {
-            List<Anime> animeList = animeRepository.findAll();
-            cacheMap.putAllAnime(animeList);
-            return animeList;
+        LOGGER.info("Getting all anime from the database.");
+        List<Anime> animeList = animeRepository.findAll();
+        LOGGER.debug("Retrieved {} anime from the database.", animeList.size());
+        if(animeList.size() > animeCache.getAllAnime().size()){
+            animeList.forEach(anime -> {
+                if(!animeCache.contains(anime.getId())){
+                    animeCache.put(anime.getId(), anime);
+                }
+            });
         }
+        return animeCache.getAllAnime();
     }
 
     public Anime getAnimeData(String animeName) {
+        LOGGER.info("Getting anime data for anime with name: {}", animeName);
         RestTemplate restTemplate = new RestTemplate();
         Anime anime = animeRepository.findByNameIgnoreCase(animeName); //ищем в бд
 
         if (anime != null) {
-            if (!cacheMap.getAllAnime().contains(anime)){
-                cacheMap.put(anime.getId(), anime);
+            LOGGER.info("Anime found in the database.");
+            if (!animeCache.getAllAnime().contains(anime)){
+                animeCache.put(anime.getId(), anime);
             }
             return anime;
         }
+        LOGGER.info("Anime not found in the database, searching external API.");
         String url = "https://api.jikan.moe/v4/anime";
         String response = restTemplate.getForObject(url, String.class);
 
@@ -73,7 +80,7 @@ public class AnimeService {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("context", e);
+            LOGGER.error("An error occurred while fetching anime data.", e);
         }
         return null;
     }
@@ -128,6 +135,7 @@ public class AnimeService {
     }
 
     public Anime createAnime(Anime anime) {
+        LOGGER.info("Creating anime object: {}", anime);
         Anime animeTemp = animeRepository.findByNameIgnoreCase(anime.getName());
         if (animeTemp != null) {
             return animeTemp;
@@ -148,14 +156,16 @@ public class AnimeService {
 
 
     public void deleteAnime(String title) {
+        LOGGER.info("Delete anime with name: {}", title);
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if (animeTemp != null) {
-            cacheMap.remove(animeTemp.getId());
+            animeCache.remove(animeTemp.getId());
             animeRepository.delete(animeTemp);
         }
     }
 
     public Anime patchAnime(String title, int episodes) {
+        LOGGER.info("Changing episodes in title: {}", title);
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if (animeTemp != null) {
             animeTemp.setEpisodes(episodes);
@@ -165,6 +175,7 @@ public class AnimeService {
     }
 
     public Anime putAnime(String title, Anime anime) {
+        LOGGER.info("Updating anime data for anime with name: {}", title);
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if (animeTemp != null) {
             anime.setId(animeTemp.getId());
@@ -173,7 +184,8 @@ public class AnimeService {
         return null;
     }
 
-    public List<Anime> getAnimesByGenre(String genreName) {
-        return animeRepository.findAnimesByGenre(genreName);
+    public List<Anime> getAnimeByGenre(String genreName) {
+        LOGGER.info("Output anime with genre: {}", genreName);
+        return animeRepository.findAnimeByGenre(genreName);
     }
 }

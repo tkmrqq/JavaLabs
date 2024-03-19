@@ -13,6 +13,6 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     Anime findByNameIgnoreCase(String name);
 
     @Query("SELECT a FROM Anime a JOIN a.genres g WHERE g.name = :genreName")
-    List<Anime> findAnimesByGenre(@Param("genreName") String genreName);
+    List<Anime> findAnimeByGenre(@Param("genreName") String genreName);
 }
 
