@@ -53,7 +53,9 @@ public class AnimeService {
     }
 
     public Anime getAnimeData(String animeName) {
-        LOGGER.info("Getting anime data for anime with name: {}", animeName);
+        if(animeName != null){
+            LOGGER.info("Getting anime data for anime with name: {}", animeName);
+        }
         RestTemplate restTemplate = new RestTemplate();
         Anime anime = animeRepository.findByNameIgnoreCase(animeName); //ищем в бд
 
@@ -156,7 +158,9 @@ public class AnimeService {
 
 
     public void deleteAnime(String title) {
-        LOGGER.info("Delete anime with name: {}", title);
+        if(title != null){
+            LOGGER.info("Delete anime with name: {}", title);
+        }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if (animeTemp != null) {
             animeCache.remove(animeTemp.getId());
@@ -165,7 +169,9 @@ public class AnimeService {
     }
 
     public Anime patchAnime(String title, int episodes) {
-        LOGGER.info("Changing episodes in title: {}", title);
+        if(title != null){
+            LOGGER.info("Changing episodes in title: {}", title);
+        }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if (animeTemp != null) {
             animeTemp.setEpisodes(episodes);
@@ -175,7 +181,9 @@ public class AnimeService {
     }
 
     public Anime putAnime(String title, Anime anime) {
-        LOGGER.info("Updating anime data for anime with name: {}", title);
+        if(title != null){
+            LOGGER.info("Updating anime data for anime with name: {}", title);
+        }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
         if (animeTemp != null) {
             anime.setId(animeTemp.getId());
