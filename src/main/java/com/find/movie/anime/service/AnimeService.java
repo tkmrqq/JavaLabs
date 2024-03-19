@@ -22,11 +22,13 @@ import java.util.List;
 @Service
 public class AnimeService {
 
+    private static final String REGEX = "[\n\r]";
     private final AnimeRepository animeRepository;
     private final GenreRepository genreRepository;
     private final TitlesRepository titlesRepository;
     private final CacheConfig animeCache;
     private static final Logger LOGGER = LoggerFactory.getLogger(AnimeService.class);
+
 
     @Autowired
     public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository,
@@ -54,7 +56,7 @@ public class AnimeService {
 
     public Anime getAnimeData(String animeName) {
         if(animeName != null){
-            animeName = animeName.replaceAll("[\n\r]", "_");
+            animeName = animeName.replaceAll(REGEX, "_");
             LOGGER.info("Getting anime data for anime with name: {}", animeName);
         }
         RestTemplate restTemplate = new RestTemplate();
@@ -160,7 +162,7 @@ public class AnimeService {
 
     public void deleteAnime(String title) {
         if(title != null){
-            title = title.replaceAll("[\n\r]", "_");
+            title = title.replaceAll(REGEX, "_");
             LOGGER.info("Delete anime with name: {}", title);
         }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
@@ -172,7 +174,7 @@ public class AnimeService {
 
     public Anime patchAnime(String title, int episodes) {
         if(title != null){
-            title = title.replaceAll("[\n\r]", "_");
+            title = title.replaceAll(REGEX, "_");
             LOGGER.info("Changing episodes in title: {}", title);
         }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
@@ -185,7 +187,7 @@ public class AnimeService {
 
     public Anime putAnime(String title, Anime anime) {
         if(title != null){
-            title = title.replaceAll("[\n\r]", "_");
+            title = title.replaceAll(REGEX, "_");
             LOGGER.info("Updating anime data for anime with name: {}", title);
         }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
