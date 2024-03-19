@@ -54,6 +54,7 @@ public class AnimeService {
 
     public Anime getAnimeData(String animeName) {
         if(animeName != null){
+            animeName = animeName.replaceAll("[\n\r]", "_");
             LOGGER.info("Getting anime data for anime with name: {}", animeName);
         }
         RestTemplate restTemplate = new RestTemplate();
@@ -159,6 +160,7 @@ public class AnimeService {
 
     public void deleteAnime(String title) {
         if(title != null){
+            title = title.replaceAll("[\n\r]", "_");
             LOGGER.info("Delete anime with name: {}", title);
         }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
@@ -170,6 +172,7 @@ public class AnimeService {
 
     public Anime patchAnime(String title, int episodes) {
         if(title != null){
+            title = title.replaceAll("[\n\r]", "_");
             LOGGER.info("Changing episodes in title: {}", title);
         }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
@@ -182,6 +185,7 @@ public class AnimeService {
 
     public Anime putAnime(String title, Anime anime) {
         if(title != null){
+            title = title.replaceAll("[\n\r]", "_");
             LOGGER.info("Updating anime data for anime with name: {}", title);
         }
         Anime animeTemp = animeRepository.findByNameIgnoreCase(title);
