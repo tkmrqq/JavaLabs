@@ -188,23 +188,22 @@ public class AnimeService {
     public List<Anime> createBulkAnime(List<Anime> animeList) {
         return animeList.stream()
                 .filter(anime -> animeRepository.findByNameIgnoreCase(anime.getName()) == null)
-                .peek(anime -> {
-                    anime.getGenres().forEach(genre -> {
-                        if (genre.getId() == null) {
-                            genreRepository.save(genre);
-                        }
-                    });
-                    anime.getTitlesList().forEach(title -> {
-                        if (title.getId() == null) {
-                            titlesRepository.save(title);
-                        }
-                    });
+                .map(anime -> {
+                    anime.getGenres().stream()
+                            .filter(genre -> genre.getId() == null)
+                            .forEach(genreRepository::save);
+
+                    anime.getTitlesList().stream()
+                            .filter(title -> title.getId() == null)
+                            .forEach(titlesRepository::save);
+
+                    return animeRepository.save(anime);
                 })
-                .map(animeRepository::save)
                 .collect(Collectors.toList());
     }
 
-    public int getCount(){
+
+    public int getCount() {
         return requestCount.getCount();
     }
 
