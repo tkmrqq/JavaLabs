@@ -1,17 +1,15 @@
 package com.find.movie.anime.model;
 
-
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
-public class Anime {
+public class Anime {    //anime object to work with JPA and etc
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-
     @Column(columnDefinition = "TEXT")
     private String description;
     private String source;
@@ -22,10 +20,7 @@ public class Anime {
     private String picUrl;
 
     @ManyToMany
-    @JoinTable(
-            name = "anime_genres",
-            joinColumns = @JoinColumn(name = "anime_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @JoinTable(name = "anime_genres", joinColumns = @JoinColumn(name = "anime_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
 
     @OneToMany

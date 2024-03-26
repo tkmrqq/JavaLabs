@@ -3,7 +3,7 @@ package com.find.movie.anime.controller;
 import com.find.movie.anime.exception.AnimeNotFoundException;
 import com.find.movie.anime.exception.BadRequestException;
 import com.find.movie.anime.model.Anime;
-import com.find.movie.anime.service.AnimeService;
+import com.find.movie.anime.AnimeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class AnimeController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Anime>> getAll(){
+    public ResponseEntity<List<Anime>> getAll() {
         List<Anime> animeList = animeService.getAllAnime();
         return ResponseEntity.ok(animeList);
     }
@@ -73,7 +73,7 @@ public class AnimeController {
         return anime != null ? ResponseEntity.ok(anime) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("/useful/{name}")
+    @GetMapping("/genres/{name}")
     public ResponseEntity<List<Anime>> getAnimeByGenre(@PathVariable String name) {
         List<Anime> animeGenreList = animeService.getAnimeByGenre(name);
         if (animeGenreList != null && !animeGenreList.isEmpty()) {
@@ -81,6 +81,17 @@ public class AnimeController {
         } else {
             throw new AnimeNotFoundException("not found with genre: " + name);
         }
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<Anime>> createBulkAnime(@RequestBody List<Anime> animeList) {
+        List<Anime> savedAnimeList = animeService.createBulkAnime(animeList);
+        return ResponseEntity.ok(savedAnimeList);
+    }
+
+    @GetMapping("/getCount")
+    public ResponseEntity<Integer> getCount() {
+        return ResponseEntity.ok(animeService.getCount());
     }
 
 }
