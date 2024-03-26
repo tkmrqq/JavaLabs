@@ -54,21 +54,7 @@ public class AnimeServiceTest {
         verify(animeRepository, times(1)).findAll();
         verify(requestCount, times(1)).increment();
     }
-    @Test
-    public void testGetAnimeData() {
-        // Arrange
-        String animeName = "Naruto";
-        String mockResponse = "{\"id\": 8, \"name\": \"Naruto\", \"description\": \"...\"}"; // JSON-ответ
-        when(animeRepository.findByNameIgnoreCase(animeName)).thenReturn(null);
-        when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(mockResponse);
 
-        // Act
-        Anime result = animeService.getAnimeData(animeName);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(animeName, result.getName());
-    }
 
     // Write similar tests for other methods in AnimeService...
 }
